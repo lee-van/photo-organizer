@@ -11,12 +11,13 @@ usage: argdown [-h] --input INPUT [INPUT ...] --output OUTPUT [--user USER]
 ## Arguments
 ### Quick reference table
 |Short|Long       |Default|Description                                                        |
-|-----|-----------|-------|-------------------------------------------------------------------|
-|`-h` |`--help`   |       |show this help message and exit                                    |
-|`-i` |`--input`  |`None` |Input files                                                        |
-|`-o` |`--output` |`None` |Output directory                                                   |
-|`-u` |`--user`   |`None` |Name of photographer                                               |
-|`-n` |`--noMerge`|       |Do not merge any files into existing folders even if no overwriting|
+|-----|------------------|--------|-------------------------------------------------------------------|
+|`-h` |`--help`          |        |show this help message and exit                                    |
+|`-i` |`--input`         |`None`  |Input files                                                        |
+|`-o` |`--output`        |`None`  |Output directory                                                   |
+|`-u` |`--user`          |`None`  |Name of photographer                                               |
+|`-n` |`--noMerge`       |`False` |Do not merge any files into existing folders even if no overwriting|
+|`-f` |`--forceOverwrite`|`False` |Force overwrite existing files                                     |
 
 ### `-h`, `--help`
 show this help message and exit
