@@ -32,4 +32,8 @@ Output directory
 Name of photographer
 
 ### `--noMerge`, `-n`
-Do not merge any files into existing folders even if no overwriting
+Do not merge any files into existing folders even if no overwriting. I.e. do not modify any existing folders
+
+### `--forceOverwrite`, `-f`
+Force overwrite existing files
+
