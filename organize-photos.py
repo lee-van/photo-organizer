@@ -6,7 +6,7 @@ import exifread, progressbar
 
 ################################################################################################################################################################
 
-def parse_exif(image_files:List[str], key):
+def parse_exif(image_files:List[str], key:str):
     """
     Parses list of images, returns dict of dicts (key=filename, value=exif dict)
     """
@@ -18,7 +18,15 @@ def parse_exif(image_files:List[str], key):
     return exif_values
 
 
-def parse_datetime(datetime_str):
+def infer_datetime_from_filename(filename:str):
+    m = re.match(r'(20\d{2})[:\-_\.](\d{2})[:\-_\.](\d{2})', filename)
+    if m:
+        (year, month, day) = m.groups()
+        return (year, month, day, None, None, None)
+    else:
+        return None
+
+def parse_datetime(datetime_str:str):
     m = re.match(r'(\d+):(\d+):(\d+) (\d+):(\d+):(\d+)', datetime_str)
     (year, month, day, hour, minute, second) = m.groups()
     return (year, month, day, hour, minute, second)
@@ -35,7 +43,7 @@ def parse_args():
     return args
 
 
-def set_destinations(datetimes, args):
+def set_destinations(datetimes:dict, args):
     """
     Defines mv destination for files based on datetime and user
     """  
@@ -44,19 +52,26 @@ def set_destinations(datetimes, args):
     for file, datetime in datetimes.items():
         if datetime:
             (year, month, day, hour, minute, second) = parse_datetime(datetime)
-            user = ''
-            if args.user:
-                user = f"_{args.user}"
-            output_dir = os.path.join(args.output, f"{year}-{month}-{day}{user}")
-            output_dirs.add(output_dir)
-            destination = os.path.join(output_dir, os.path.basename(file))
-            destinations[file] = destination
         else:
-            destinations[file] = None
+            try:
+                (year, month, day, hour, minute, second) = infer_datetime_from_filename(file)
+                print(f'WARNING: \'Image DateTime\' inferred from filename not exif {file}', file=sys.stderr)
+            except:
+                destinations[file] = None
+                continue
+        
+        user = ''
+        if args.user:
+            user = f"_{args.user}"
+        output_dir = os.path.join(args.output, f"{year}-{month}-{day}{user}")
+        output_dirs.add(output_dir)
+        destination = os.path.join(output_dir, os.path.basename(file))
+        destinations[file] = destination
+
     return (output_dirs, destinations)
 
 
-def check_if_outputdirs_exist(output_dirs):
+def check_if_outputdirs_exist(output_dirs:set):
     existing_output_dirs = set()
     for output_dir in output_dirs:
         if os.path.exists(output_dir):
@@ -64,7 +79,7 @@ def check_if_outputdirs_exist(output_dirs):
     return existing_output_dirs
 
 
-def move_files(destinations, args, dirsToSkip = []):
+def move_files(destinations:dict, args, dirsToSkip = set()):
     """
     Moves files, skipping if 1) no metadata parsed, 2) avoid merge, or 3) avoid overwrite
     """      
