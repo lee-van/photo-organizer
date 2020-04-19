@@ -6,27 +6,23 @@ import exifread, progressbar
 
 ################################################################################################################################################################
 
-def parse_exif(image_files:List[str]):
+def parse_exif(image_files:List[str], key):
     """
     Parses list of images, returns dict of dicts (key=filename, value=exif dict)
     """
-    exif_dict = {}
+    exif_values = {}
     for file in progressbar.progressbar(image_files):
         with open(file, 'rb') as handle:
-            exif_dict[file] = exifread.process_file(handle)
-    return exif_dict
+            exif_dict = exifread.process_file(handle)
+            exif_values[file] = str(exif_dict[key]) if (key in exif_dict) else None
+    return exif_values
 
-def parse_exifdict(exif_dict, key):
-    """
-    Parses dict of exif metadata for key
-    """  
-    values = {file:(str(exif[key]) if (key in exif) else None) for file,exif in exif_dict.items()}
-    return values
 
 def parse_datetime(datetime_str):
     m = re.match(r'(\d+):(\d+):(\d+) (\d+):(\d+):(\d+)', datetime_str)
     (year, month, day, hour, minute, second) = m.groups()
     return (year, month, day, hour, minute, second)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Basic photo organizer based on exif metadata')
@@ -37,6 +33,7 @@ def parse_args():
     parser.add_argument('--forceOverwrite', '-f', action='store_true', help='Force overwrite existing files')
     args = parser.parse_args()
     return args
+
 
 def set_destinations(datetimes, args):
     """
@@ -58,12 +55,14 @@ def set_destinations(datetimes, args):
             destinations[file] = None
     return (output_dirs, destinations)
 
+
 def check_if_outputdirs_exist(output_dirs):
     existing_output_dirs = set()
     for output_dir in output_dirs:
         if os.path.exists(output_dir):
             existing_output_dirs.add(output_dir)
     return existing_output_dirs
+
 
 def move_files(destinations, args, dirsToSkip = []):
     """
@@ -105,10 +104,7 @@ if __name__ == "__main__":
 
     #file: exif dict
     print("LOG: parsing exif data")
-    exif_dict = parse_exif(args.input)
-
-    #file: datetime (and datetime tuples) dict
-    datetimes = parse_exifdict(exif_dict, 'Image DateTime')
+    datetimes = parse_exif(args.input, 'Image DateTime')
 
     #move files to new folder
     print("LOG: moving files")
