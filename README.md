@@ -5,12 +5,12 @@ Uses exif if available, otherwise attempts to infer from filename
 # Arguments and Usage
 ## Usage
 ```
-usage: argdown [-h] --input INPUT [INPUT ...] --output OUTPUT [--user USER]
-               [--noMerge]
+usage: python organize-photos.py [-h] --input INPUT [INPUT ...] --output OUTPUT [--user USER]
+               [--noMerge] [--forceOverwrite]
 ```
 ## Arguments
 ### Quick reference table
-|Short|Long       |Default|Description                                                        |
+|Short|Long              |Default |Description                                                        |
 |-----|------------------|--------|-------------------------------------------------------------------|
 |`-h` |`--help`          |        |show this help message and exit                                    |
 |`-i` |`--input`         |`None`  |Input files                                                        |
